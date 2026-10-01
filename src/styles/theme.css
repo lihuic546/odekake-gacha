@@ -1,0 +1,794 @@
+/* =========================================================
+   お出かけガチャ — 世界観テーマ「赤・青・白の案内所」
+   レトロなカプセルトイ売り場 × 案内所の温かさ
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&family=RocknRoll+One&family=Zen+Maru+Gothic:wght@500;700;900&display=swap');
+
+:root {
+  /* --- 主要3色 --- */
+  --red: #e63946;
+  --red-deep: #c1121f;
+  --red-soft: #ff6b78;
+  --blue: #1d4e89;
+  --blue-deep: #14315a;
+  --blue-soft: #4a7fc4;
+  --white: #fdfaf3; /* 生成りに近い白（紙質感） */
+  --white-pure: #ffffff;
+
+  /* --- 補助 --- */
+  --cream: #f7efe0;
+  --ink: #2a2320;
+  --ink-soft: #6b5f57;
+  --gold: #e9b949;
+  --shadow: rgba(20, 49, 90, 0.18);
+
+  /* --- タイポ --- */
+  --font-display: 'RocknRoll One', 'Zen Maru Gothic', sans-serif;
+  --font-heading: 'Zen Maru Gothic', sans-serif;
+  --font-body: 'Kiwi Maru', 'Zen Maru Gothic', serif;
+
+  /* --- 形 --- */
+  --radius: 20px;
+  --radius-lg: 28px;
+  --stripe: repeating-linear-gradient(
+    45deg,
+    var(--red) 0 18px,
+    var(--white) 18px 36px,
+    var(--blue) 36px 54px,
+    var(--white) 54px 72px
+  );
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  /* 空 → 案内所の床 のグラデ + 紙の粒子 */
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #fff 0%, transparent 60%),
+    radial-gradient(900px 500px at 10% 110%, rgba(29, 78, 137, 0.12) 0%, transparent 60%),
+    radial-gradient(900px 500px at 90% 110%, rgba(230, 57, 70, 0.1) 0%, transparent 60%),
+    linear-gradient(180deg, #eaf1fb 0%, var(--white) 40%, var(--cream) 100%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+/* ざらっとした紙テクスチャ（軽量なノイズ） */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================================================
+   レイアウト
+   ========================================================= */
+.stage {
+  min-height: 100dvh;
+  max-width: 480px;
+  margin-inline: auto;
+  padding: max(env(safe-area-inset-top), 20px) 20px
+    max(env(safe-area-inset-bottom), 24px);
+  display: flex;
+  flex-direction: column;
+}
+
+.stage__top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* 案内所の看板 */
+.signboard {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: var(--white);
+  background: var(--blue-deep);
+  padding: 6px 16px;
+  border-radius: 999px;
+  box-shadow: 0 3px 0 rgba(20, 49, 90, 0.35);
+  position: relative;
+}
+.signboard::before {
+  content: '🎫';
+  margin-right: 6px;
+}
+
+/* =========================================================
+   ボタン
+   ========================================================= */
+.btn {
+  font-family: var(--font-display);
+  font-size: 18px;
+  border: none;
+  border-radius: 999px;
+  padding: 16px 28px;
+  cursor: pointer;
+  color: var(--white-pure);
+  background: linear-gradient(180deg, var(--red-soft), var(--red));
+  box-shadow: 0 6px 0 var(--red-deep), 0 12px 22px var(--shadow);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  letter-spacing: 0.06em;
+  touch-action: manipulation;
+}
+.btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 var(--red-deep), 0 6px 12px var(--shadow);
+}
+.btn--blue {
+  background: linear-gradient(180deg, var(--blue-soft), var(--blue));
+  box-shadow: 0 6px 0 var(--blue-deep), 0 12px 22px var(--shadow);
+}
+.btn--blue:active {
+  box-shadow: 0 2px 0 var(--blue-deep), 0 6px 12px var(--shadow);
+}
+.btn--ghost {
+  background: var(--white-pure);
+  color: var(--blue);
+  box-shadow: 0 4px 0 rgba(29, 78, 137, 0.25), 0 8px 16px var(--shadow);
+  border: 2px solid var(--blue);
+}
+.btn:disabled {
+  filter: grayscale(0.5) opacity(0.6);
+  cursor: default;
+}
+.btn--full {
+  width: 100%;
+}
+
+/* =========================================================
+   カード（紙・チケット風）
+   ========================================================= */
+.card {
+  background: var(--white-pure);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px var(--shadow), inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+  padding: 22px;
+  position: relative;
+}
+
+/* チケットの切り込み（左右の半円） */
+.ticket {
+  position: relative;
+  background: var(--white-pure);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 34px var(--shadow);
+}
+.ticket::before,
+.ticket::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  background: var(--white);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+.ticket::before {
+  left: -11px;
+}
+.ticket::after {
+  right: -11px;
+}
+
+/* トップの三色ストライプ帯 */
+.stripe-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--stripe);
+  background-size: 102px 102px;
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* =========================================================
+   吹き出し
+   ========================================================= */
+.bubble {
+  position: relative;
+  background: var(--white-pure);
+  border: 2.5px solid var(--blue-deep);
+  border-radius: 999px;
+  padding: 14px 22px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink);
+  text-align: center;
+  box-shadow: 0 5px 0 rgba(20, 49, 90, 0.15);
+}
+.bubble--red {
+  border-color: var(--red-deep);
+  box-shadow: 0 5px 0 rgba(193, 18, 31, 0.15);
+}
+.bubble__tail {
+  position: absolute;
+  bottom: -13px;
+  width: 20px;
+  height: 20px;
+  background: var(--white-pure);
+  border-right: 2.5px solid var(--blue-deep);
+  border-bottom: 2.5px solid var(--blue-deep);
+  transform: rotate(45deg);
+}
+.bubble--red .bubble__tail {
+  border-color: var(--red-deep);
+}
+.bubble__who {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--blue);
+  margin-bottom: 2px;
+}
+.bubble--red .bubble__who {
+  color: var(--red-deep);
+}
+
+/* =========================================================
+   タイトル
+   ========================================================= */
+.title-logo {
+  font-family: var(--font-display);
+  text-align: center;
+  line-height: 1.05;
+}
+.title-logo__sub {
+  display: inline-block;
+  font-size: 15px;
+  letter-spacing: 0.3em;
+  color: var(--blue);
+  background: var(--white-pure);
+  padding: 4px 14px 4px 18px;
+  border-radius: 999px;
+  box-shadow: 0 3px 0 var(--shadow);
+  margin-bottom: 10px;
+}
+.title-logo__main {
+  font-size: clamp(40px, 13vw, 60px);
+  color: var(--red);
+  text-shadow:
+    3px 3px 0 var(--white-pure),
+    5px 5px 0 var(--blue);
+  transform: rotate(-2deg);
+}
+
+/* =========================================================
+   選択肢チップ
+   ========================================================= */
+.choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.choice {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 15px;
+  background: var(--white-pure);
+  border: 2.5px solid var(--cream);
+  border-radius: 18px;
+  padding: 16px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+  transition: transform 0.12s ease, border-color 0.12s ease,
+    box-shadow 0.12s ease, background 0.12s ease;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.05);
+}
+.choice__emoji {
+  font-size: 26px;
+  line-height: 1;
+}
+.choice__sub {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+.choice:active {
+  transform: scale(0.97);
+}
+.choice[data-selected='true'] {
+  border-color: var(--red);
+  background: linear-gradient(180deg, #fff, #fff5f6);
+  box-shadow: 0 4px 0 var(--red-deep), 0 8px 18px var(--shadow);
+  transform: translateY(-2px);
+}
+
+/* 進捗ドット */
+.dots {
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  margin: 4px 0 14px;
+}
+.dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(29, 78, 137, 0.2);
+  transition: all 0.2s ease;
+}
+.dots span[data-on='true'] {
+  background: var(--red);
+  transform: scale(1.3);
+}
+
+/* =========================================================
+   ユーティリティ
+   ========================================================= */
+.center {
+  text-align: center;
+}
+.muted {
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+.spacer {
+  flex: 1;
+}
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+.h1 {
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: 22px;
+  margin: 0;
+}
+.field {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 2.5px solid var(--cream);
+  background: var(--white-pure);
+  color: var(--ink);
+}
+.field:focus {
+  outline: none;
+  border-color: var(--blue);
+}
+a {
+  color: var(--blue);
+}
+
+@keyframes floaty {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.floaty {
+  animation: floaty 3.4s ease-in-out infinite;
+}
+/* もう1人ぶんの、少しズレたふわふわ */
+.floaty--alt {
+  animation-duration: 2.9s;
+  animation-delay: 0.5s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floaty { animation: none; }
+}
+
+/* キャラの白フチ（背景から浮かせる・ステッカー風） */
+.chara {
+  filter:
+    drop-shadow(2.5px 0 0 #fff) drop-shadow(-2.5px 0 0 #fff)
+    drop-shadow(0 2.5px 0 #fff) drop-shadow(0 -2.5px 0 #fff)
+    drop-shadow(1.8px 1.8px 0 #fff) drop-shadow(-1.8px 1.8px 0 #fff)
+    drop-shadow(1.8px -1.8px 0 #fff) drop-shadow(-1.8px -1.8px 0 #fff)
+    drop-shadow(0 5px 5px rgba(20, 49, 90, 0.28));
+}
+
+/* 丸いガチャボタン */
+.btn-round {
+  width: 152px;
+  height: 152px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  color: #fff;
+  cursor: pointer;
+  background: var(--red);
+  box-shadow: 0 8px 0 var(--red-deep), 0 16px 28px var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  touch-action: manipulation;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.btn-round:active {
+  transform: translateY(5px);
+  box-shadow: 0 3px 0 var(--red-deep), 0 8px 14px var(--shadow);
+}
+
+/* =========================================================
+   レトロ駅の案内所 背景
+   ========================================================= */
+.annaijo-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+/* 写真背景：横長版をデフォルト、縦画面ではスマホ版に切替 */
+.annaijo-bg--photo {
+  background-image: linear-gradient(rgba(20, 22, 34, 0.22), rgba(20, 22, 34, 0.34)),
+    var(--bg-land);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+@media (max-aspect-ratio: 1 / 1) {
+  .annaijo-bg--photo {
+    background-image: linear-gradient(rgba(20, 22, 34, 0.22), rgba(20, 22, 34, 0.34)),
+      var(--bg-port);
+  }
+}
+.stage {
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================================================
+   手描きモック準拠のパーツ
+   ========================================================= */
+
+/* 大バナー見出し（お出かけ案内所 / ガチャチケット） */
+.banner {
+  align-self: center;
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: clamp(24px, 7vw, 32px);
+  color: var(--ink);
+  background: var(--white-pure);
+  border: 3px solid var(--ink);
+  border-radius: 46px / 70px;
+  padding: 12px 28px;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.08);
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+/* 結果見出し（赤文字＋下線／背景は下の白パネルで確保） */
+.banner--result {
+  align-self: stretch;
+  background: transparent;
+  color: var(--red);
+  border: none;
+  border-bottom: 4px solid var(--blue);
+  border-radius: 0;
+  box-shadow: none;
+  font-size: clamp(26px, 8vw, 34px);
+  padding: 4px 6px 8px;
+}
+
+/* 結果画面ぜんぶを乗せる白パネル（赤×青の二重線・不透過） */
+.result-panel {
+  background: var(--white-pure);
+  border: 3px solid var(--red);
+  border-radius: 20px;
+  padding: 24px 18px 26px;
+  box-shadow:
+    inset 0 0 0 7px var(--white-pure),
+    inset 0 0 0 10px var(--blue),
+    0 12px 34px var(--shadow);
+}
+
+/* 選択チップ */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  border: 2.5px solid var(--ink);
+  background: var(--white-pure);
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.1s, background 0.1s, box-shadow 0.1s, color 0.1s;
+}
+.chip:active {
+  transform: scale(0.95);
+}
+.chip[data-selected='true'] {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red-deep);
+  box-shadow: 0 3px 0 var(--red-deep);
+}
+
+/* ガチャチケット画面のフォントを最初の画面（Kiwi Maru）に統一 */
+.survey,
+.survey .banner,
+.survey .qlabel,
+.survey .chip,
+.survey .btn,
+.survey .field {
+  font-family: var(--font-body);
+}
+
+/* ガチャチケット（アンケート台紙）— 赤×青の二重線フレーム */
+.gticket {
+  background: var(--white-pure);
+  border: 3px solid var(--red);
+  border-radius: 18px;
+  padding: 24px 22px 26px;
+  box-shadow:
+    inset 0 0 0 7px var(--white-pure),
+    inset 0 0 0 10px var(--blue),
+    0 10px 0 rgba(0, 0, 0, 0.06),
+    0 16px 34px var(--shadow);
+}
+
+/* 出発地の選択枠（ガチャチケットと同じ赤×青の二重線） */
+.choice-frame {
+  width: 100%;
+  background: var(--white-pure);
+  border: 3px solid var(--red);
+  border-radius: 18px;
+  padding: 24px 22px 26px;
+  box-shadow:
+    inset 0 0 0 7px var(--white-pure),
+    inset 0 0 0 10px var(--blue),
+    0 10px 26px var(--shadow);
+}
+
+/* チケット見出しを赤サインに（カラフル） */
+.survey .banner {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red-deep);
+  box-shadow: 0 4px 0 var(--red-deep);
+}
+
+/* 全画面共通の主ボタン（ガチャチケットの「まわす！」と同じ青いサイン） */
+.btn--sign {
+  font-family: var(--font-body);
+  font-weight: 500;
+  padding: 12px 34px;
+  background: var(--blue);
+  color: #fff;
+  border: 3px solid var(--blue-deep);
+  border-radius: 46px / 70px;
+  box-shadow: 0 4px 0 var(--blue-deep);
+}
+.btn--sign:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--blue-deep);
+}
+/* 戻る系の控えめボタンもフォントを揃える */
+.btn--ghost {
+  font-family: var(--font-body);
+  font-weight: 500;
+}
+
+/* 複数選択チップ：四角め＆選択で青 */
+.chip--sq {
+  border-radius: 9px;
+}
+.chip--sq[data-selected='true'] {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue-deep);
+  box-shadow: 0 3px 0 var(--blue-deep);
+}
+.qlabel {
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: 17px;
+  margin: 16px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.qlabel:first-child {
+  margin-top: 4px;
+}
+.qlabel::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--blue);
+  flex: none;
+}
+
+/* ガチャ中の集中線 */
+.gacha-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 460px;
+  height: 460px;
+  margin: -230px 0 0 -230px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(230, 57, 70, 0.16) 0deg 3deg,
+    transparent 3deg 10deg
+  );
+  animation: spinBurst 9s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+  -webkit-mask: radial-gradient(circle, #000 52%, transparent 72%);
+  mask: radial-gradient(circle, #000 52%, transparent 72%);
+}
+.burst--blue {
+  background: repeating-conic-gradient(
+    from 5deg,
+    rgba(29, 78, 137, 0.13) 0deg 3deg,
+    transparent 3deg 11deg
+  );
+  animation-direction: reverse;
+  animation-duration: 12s;
+}
+@keyframes spinBurst {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 旅行タグ・チケット（結果） */
+.tag-ticket {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  margin-inline: 10px;
+  background: var(--white-pure);
+  border: 2.5px solid #5b544f;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.06), 0 10px 22px var(--shadow);
+  min-height: 100px;
+}
+.tag-ticket__hole {
+  width: 24px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 2px dashed var(--cream);
+}
+.tag-ticket__hole::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2.5px solid #5b544f;
+}
+.tag-ticket__body {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 6px 10px 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.tag-ticket__name {
+  font-family: var(--font-heading);
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 1.2;
+}
+.tag-ticket__map {
+  display: inline-block;
+  font-size: 12px;
+  color: var(--blue);
+  font-weight: 700;
+  margin-top: 5px;
+  text-decoration: none;
+}
+.tag-ticket__type {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-top: 3px;
+}
+.tag-ticket__photo {
+  width: 84px;
+  flex: none;
+  align-self: stretch;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--cream);
+}
+.tag-ticket__stub {
+  width: 68px;
+  flex: none;
+  border-left: 2px dashed #5b544f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px;
+  text-align: center;
+  background: #fff7f8;
+}
+.tag-ticket__price {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--red-deep);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+/* 移動区間 */
+.transit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 0;
+}
+.transit__dots {
+  width: 0;
+  height: 10px;
+  border-left: 3px dotted var(--blue-soft);
+}
+.transit__pill {
+  background: var(--white-pure);
+  border: 2px solid var(--blue-soft);
+  border-radius: 999px;
+  padding: 4px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue);
+}
